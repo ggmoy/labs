@@ -1,0 +1,7 @@
+---
+- hosts: hashilab
+  remote_user: root
+
+  roles:
+    - common
+    - hashilab

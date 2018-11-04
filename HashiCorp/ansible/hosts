@@ -1,0 +1,11 @@
+[kubelab-master]
+kube-master
+
+[kubelab-minions]
+kube-minion1
+kube-minion2
+
+[hashilab]
+hashi0
+hashi1
+hashi2

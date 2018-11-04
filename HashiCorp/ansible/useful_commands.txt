@@ -1,0 +1,6 @@
+ansible all -u root -m ping
+
+firewall-cmd --permanent --add-port=8300/tcp --add-port=8301/tcp --add-port=8302/tcp --add-port=8400/tcp --add-port=8500/tcp
+
+# Verify consul service
+dig consul.service.hashilab.consul

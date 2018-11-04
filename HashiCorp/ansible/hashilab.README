@@ -1,0 +1,7 @@
+1) Install common packages and apply common configurations:
+
+    ansible-playbook hashilab.yml --tags "packages,configurations"
+
+2) Install Consul
+
+    ansible-playbook hashilab.yml --tags "consul"

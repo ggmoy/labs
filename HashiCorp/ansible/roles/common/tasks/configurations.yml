@@ -1,0 +1,4 @@
+- name: Copy global environment file
+  copy:
+    src: files/etc/environment
+    dest: /etc/environment
