@@ -1,0 +1,16 @@
+[Unit]
+Description="HashiCorp Consul - A service mesh solution"
+Documentation=https://www.consul.io/
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+ExecStartPre=/bin/sh -c 'while [ ! -e /run/create_environment_file.sh.done ]; do echo "[WARN]: Waiting for /run/create_environment_file.sh.done file been created"; sleep 1; done'
+ExecStart=/bin/sh -c 'source /run/environment_vars && /usr/local/bin/consul agent -bind=$PRIVATE_IP -datacenter=$AWS_DEFAULT_REGION -config-dir=/etc/consul.d -data-dir=/var/consul'
+ExecReload=/usr/local/bin/consul reload
+KillMode=process
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

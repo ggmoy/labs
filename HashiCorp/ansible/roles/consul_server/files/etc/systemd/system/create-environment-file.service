@@ -1,0 +1,14 @@
+[Unit]
+Description=Create Environment File
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/scripts/create_environment_file.sh
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

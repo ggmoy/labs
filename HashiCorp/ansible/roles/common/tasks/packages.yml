@@ -37,6 +37,7 @@
   package:
     name: docker-ce
     state: latest
+    enablerepo: rhui-REGION-rhel-server-extras
 
 - name: Start Docker service
   service:

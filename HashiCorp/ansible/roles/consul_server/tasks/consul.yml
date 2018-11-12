@@ -1,0 +1,66 @@
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  with_items:
+    - /etc/consul.d
+    - /etc/consul.d/ssl
+    - /var/consul
+    - /opt/scripts
+
+- name: Check if Consul is already installed
+  stat: path=/usr/local/bin/consul
+  register: file_exists
+
+- name: Download and install Consul binary
+  unarchive:
+    src: https://releases.hashicorp.com/consul/1.3.0/consul_1.3.0_linux_amd64.zip
+    dest: /usr/local/bin
+    remote_src: yes
+  when: not file_exists.stat.exists
+
+- name: Copy Consul server config file
+  copy:
+    src: etc/consul.d/config.json
+    dest: /etc/consul.d/config.json
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Copy scripts to /opt/scripts
+  copy:
+    src: "opt/scripts/{{ item }}"
+    dest: "/opt/scripts/{{ item }}"
+    owner: root
+    group: root
+    mode: "0755"
+  with_items:
+    - create_environment_file.sh
+
+- name: Copy systemd unit file
+  copy:
+    src: "etc/systemd/system/{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items:
+    - consul.service
+    - create-environment-file.service
+
+- name: Enable services
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    daemon_reload: yes
+  with_items:
+    - create-environment-file
+    - consul
+
+- name: Add ssh public key
+  authorized_key:
+    user: ec2-user
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDsV+nITci6E3sx/w3FxPa528Up2xwxvmjKYTqOTg/OSWE6TqvIBcN77hwfU7h6T9faW2M//ocBpZ8WQZ2oufSm+IvTmSACi9mGb0OOMaqY4ldCfcvrHH3NrARMCtT8xTvkd095GTTOpFZufqHCu9NFl9IR03DvHTuaUGnZk4/QrXEfbXUkeCUX/vp7mwFFS712G5GoUSWUii2DwXVCKGtxqGikBW4h9FHcB2AcUxLw0UwRJp3TkVcrnOSl+4ES3ZV+3OaGaMfhwh0yBYn9aXzUwwPwqSH2saUckxc9FAH4dYyJ/6jB151Bezc1zGAteHLWUE8HYKvKazMHsDEkabp2/6eeY7xFh0EcCkDVC9hOE8We9TJxYnhCoR2vcivEjiY56u8AqbjOo+SumRvk3TCpB+tEkHpxbLBlMaUXKXOX9LBA/LzopP04q3eOLeq4m74+ikq0Fuk2rIcvzPOpyEzboL+IfgFgwpLVBK1gpp1QP50fbk29X3Z/l00n3W0uFJ3aK+cQgmREGQFUeEu5shuPawPxLJocor6NElJQWxHAAb/kh50yJFZQO1Own+WWwr6wJp6vzOQtUSfny2IsxF9Z7u5Fc8Lx6O6EKdnxC5GgQq2llSnb3o3t3Z1lNnlbteIxiS9vEOEFseaae+IY5xDyVtLPwxz10556MwAaZNAXgw=="
